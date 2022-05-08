@@ -1,0 +1,16 @@
+{
+    "title": "Service",
+    "description": "Exposure of a given service",
+    "type": "object",
+
+    "properties": {
+        "port": {
+            "description": "A service's port that needs to be port forwarded",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+        }
+    },
+
+    "required": ["port"]
+}
