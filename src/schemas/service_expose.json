@@ -2,15 +2,26 @@
     "title": "Service",
     "description": "Exposure of a given service",
     "type": "object",
-
     "properties": {
         "port": {
             "description": "A service's port that needs to be port forwarded",
             "type": "integer",
             "minimum": 0,
             "maximum": 65535
+        },
+        "proto": {
+            "description": "The protocol used by the service",
+            "type": "string",
+            "default": "http"
+        },
+        "bind_tls": {
+            "description": "A service's port that needs to be port forwarded",
+            "type": "boolean",
+            "default": "false"
         }
     },
-
-    "required": ["port"]
+    "required": [
+        "port",
+        "proto"
+    ]
 }
