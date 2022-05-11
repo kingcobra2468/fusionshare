@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  description: A simple RESTful service for exposing local ports to the world. Built on top of Ngrok.
+  version: 1.0.0
+  title: FusionShare
+servers:
+  - url: http://{hostname}:{port}
+    variables:
+      port:
+        default: "8085"
+      hostname:
+        default: 0.0.0.0
+paths:
+  /services/{name}:
+    get:
+      summary: Gets the URI for a given tunnel. 
+      parameters:
+        - name: name
+          in: path
+          description: Name of the tunnel.
+          required: true
+          schema:
+            type : string
+      responses:
+        "200":
+          description: The tunnel URI has successfully been retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceURI"
+        "404":
+          description: Failed to retrieve the tunnel URI as no tunnel is registered with the given name.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Creates a new proxy uri for a given port. This removes an existing proxy if one exists.
+      parameters:
+        - name: name
+          in: path
+          description: Name to give to the tunnel.
+          required: true
+          schema:
+            type : string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                port:
+                  description: A service's port that needs to be port forwarded
+                  type: integer
+                  minimum: 1
+                  maximum: 65535
+                  default: 80
+                proto:
+                  description: The protocol used by the service
+                  type: string
+                  default: http
+                bind_tls:
+                  description: A service's port that needs to be port forwarded
+                  type: boolean
+                  default: true
+              required:
+                - port
+                - proto
+      responses:
+        "200":
+          description: The tunnel has successfully been opened.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceURI"
+        "409":
+          description: Failed to open a tunnel as the name is currently being used by another tunnel.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Deletes and perform the tear down of a given tunnel. 
+      parameters:
+        - name: name
+          in: path
+          description: Name of the tunnel.
+          required: true
+          schema:
+            type : string
+      responses:
+        "200":
+          description: The tunnel has successfully been torn down.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceURI"
+        "404":
+          description: Failed to close the tunnel as no tunnel is registered with the given name.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    ServiceURI:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+          enum:
+            - success
+            - fail
+        data:
+          type: object
+          properties:
+            uri:
+              type: string
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+          enum:
+            - error
+        data:
+          type: object
+          properties:
+            title:
+              type: string
+              example: Summary of the error.
+            description:
+              type: string
+              example: Detailed description of the error.
+              
