@@ -1,7 +1,8 @@
 import logging
 
 from falcon.media.validators import jsonschema
-from falcon import HTTPConflict, HTTPNotFound
+from falcon import HTTPConflict, HTTPNotFound, HTTPForbidden
+from proxy.exceptions import RestrictedPortError
 from schemas import load_schema
 
 logger = logging.getLogger(__name__)
@@ -49,8 +50,15 @@ class ServiceResource:
                                description=f'The service by the name "{name}" already exists')
 
         data = req.get_media()
-        tunnel = self._tunnel_router.expose_port(
-            name, data['port'], data['proto'], data.get('bind_tls', True))
+
+        try:
+            tunnel = self._tunnel_router.expose_port(
+                name, data['port'], data['proto'], data.get('bind_tls', True))
+        except RestrictedPortError as e:
+            logger.warn(
+                'Attempted to open restricted port %d', data['port'])
+            raise HTTPForbidden(title='Attempt to open restricted port',
+                                description=f'Attempted to open restricted port {data["port"]}')
 
         resp.media = {
             'status': 'success',
