@@ -74,6 +74,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServiceURI"
+        "403":
+          description: Failed to open a tunnel as the name is currently being used by another tunnel.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "409":
           description: Failed to open a tunnel as the name is currently being used by another tunnel.
           content:

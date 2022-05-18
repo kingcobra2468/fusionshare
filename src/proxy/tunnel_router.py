@@ -1,4 +1,5 @@
 import logging
+from proxy.exceptions import RestrictedPortError
 
 from pyngrok import ngrok
 
@@ -12,16 +13,19 @@ class TunnelRouter:
     its corresponding tunnel endpoint. 
     """
 
-    def __init__(self, auth_token=None):
+    def __init__(self, port_guard, auth_token=None):
         """Constructor.
 
         Args:
+            port_guard (proxy.port_guard.PortGuard): An instance of port guard for determining
+            the allowed and denied ports.
             auth_token (str, optional): The auth token for Ngrok. With this token,
             more features are unlocked as part of Ngrok's free plan. Without it,
             certain features might not work. Defaults to None.
         """
         if auth_token:
             ngrok.set_auth_token(auth_token)
+        self._port_guard = port_guard
         self._cache = {}
 
     def expose_port(self, name, port, proto, bind_tls=True):
@@ -33,9 +37,16 @@ class TunnelRouter:
             proto (str): The protocol to use (e.g. http, tcp, udp, ...)
             bind_tls (bool, optional): Whether to only create a TLS tunnel. Defaults to True.
 
+        Raises:
+            RestrictedPortError: Thrown when there was an attempt to open a port that has
+            been marked as restricted.
+            
         Returns:
             str: The uri for the corresponding tunnel.
         """
+        if not self._port_guard.allowed(port):
+            raise RestrictedPortError(port)
+        
         logger.info(
             'Created a new tunnel called "%s" on port %i using %s protocol', name, port, proto)
         tunnel = ngrok.connect(addr=port, name=name, proto=proto,
