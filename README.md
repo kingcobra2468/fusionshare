@@ -14,11 +14,22 @@ the yaml file (found in `docs/swagger` directory) into Swagger. To setup Swagger
 the docs found [here](https://swagger.io/docs/open-source-tools/swagger-editor/).
 
 ## Configuration
+
+### Env File
 Configuration for FusionShare lives within an env file. Copy/rename the template.env
 file into `.env`. Then, the following options can be configured:
 - **FUSIONSHARE_NGROK_AUTH_TOKEN=** The auth token for Ngrok. The token becomes accessible
   after an Ngrok account is created. Only a free tier account is needed for FusionShare.  
 - **FUSIONSHARE_PORT=** The port on which FusionShare runs on.
+- **FUSIONSHARE_CONFIG_PATH=** An alternate path to the `config.yml` file.
+
+### Port Allow and Deny Lists
+It is possible to filter which ports are allowed to be exposed. First copy/rename
+`config_template.yml` to `config.yml`. From there, adding a port to `denied` will
+prevent that port from being tunneled. In terms of allowed ports, there are two flows:
+1. Leave `allowed` empty will allow all ports as long as they are not in `denied`.
+2. Putting an entry into `allowed` will only allow ports that are in the `allowed` list.
+
 
 ## Installation
 1. Ensure that Python 3.6+ is on the system.
