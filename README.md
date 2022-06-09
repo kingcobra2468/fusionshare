@@ -30,9 +30,18 @@ prevent that port from being tunneled. In terms of allowed ports, there are two 
 1. Leave `allowed` empty will allow all ports as long as they are not in `denied`.
 2. Putting an entry into `allowed` will only allow ports that are in the `allowed` list.
 
-
 ## Installation
 1. Ensure that Python 3.6+ is on the system.
 2. Install dependencies with with `pip3 install -r requirements.txt`.
 3. Setup the `.env` file as described in the [config](#configuration) section.
 4. Once inside `/src`, run FusionShare with `python3 app.py`.
+
+### Docker
+1. Build FusionShare image with `docker build -t fusionshare:1.0 .`.
+2. Setup the `.env` file as described in the [config](#configuration) section.
+3. Launch FusionShare. The config is searched in `/fusionshare/config` by default.
+   An example execution, assuming **FUSIONSHARE_PORT** is set to `8086`, and the `config.yml`
+   is in the current directory, would be:
+  ```bash
+  docker run --env-file .env -p 8086:8086 -e FUSIONSHARE_CONFIG_PATH="/fusionshare/config" -v $PWD:/fusionshare/config  fusionshare:1.0
+  ```
